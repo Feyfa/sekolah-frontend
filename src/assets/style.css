@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+th,
+td {
+  @apply p-3 text-start border-b border-b-neutral-400;
+}
+.input-container {
+  @apply w-full flex flex-col justify-center items-start;
+}
+
+.disabled {
+  @apply opacity-70;
+}
+
+.model-email-process {
+  @apply bg-[rgba(0,0,0,.6)] backdrop-blur-sm
+}
