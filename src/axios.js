@@ -2,7 +2,8 @@ import axios from "axios";
 
 const instance = axios.create({
   // baseURL: 'http://127.0.0.1:8000/api',
-  baseURL: `${import.meta.env.VITE_APP_BACKEND_BASE_URL}/api`,
+  baseURL: `http://sekolah.backend.com/api`,
+  // baseURL: `${import.meta.env.VITE_APP_BACKEND_BASE_URL}/api`,
   timeout: 30000
 });
 
