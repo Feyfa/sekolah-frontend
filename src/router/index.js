@@ -76,7 +76,7 @@ router.beforeEach((to, from, next) => {
               // fetch notification
               axios.get('/notification/export-large-csv')
                    .then(response => {
-                    if(response.data.result == 'success') {
+                    if(response.data.dataFormat != '') {
                       ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
                       document.location = response.data.dataFormat.link
                     }
@@ -109,7 +109,7 @@ router.beforeEach((to, from, next) => {
             // fetch notification
             axios.get('/notification/export-large-csv')
                  .then(response => {
-                  if(response.data.result == 'success' && response.data.dataFormat != '') {
+                  if(response.data.dataFormat != '') {
                     ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
                     document.location = response.data.dataFormat.link
                   }

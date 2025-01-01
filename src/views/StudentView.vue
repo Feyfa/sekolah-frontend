@@ -74,15 +74,17 @@
         <button 
           id="button-large-export"
           type="button"
-          class="w-28 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out hover:bg-gray-300 hover:scale-105 hover:shadow"
+          class="w-28 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
+          :class="{'disabled cursor-not-allowed': disabled.buttonExportLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !disabled.buttonExportLargeCSV}"
+          :disabled="disabled.buttonExportLargeCSV"
           @click="exportLargeCSV">
           Export Large
         </button>
         <button 
           id="button-export"
           type="button"
-          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out hover:bg-gray-300 hover:scale-105 hover:shadow"
-          :class="{'disabled': disabled.buttonExport}"
+          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
+          :class="{'disabled cursor-not-allowed': disabled.buttonExport, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !disabled.buttonExport}"
           :style="{visibility: students.data.length < 1 ? 'hidden' : 'visible' }"
           :disabled="disabled.buttonExport"
           @click="exportExcel">
@@ -91,8 +93,8 @@
         <button 
           id="button-import"
           type="button" 
-          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out hover:bg-gray-300 hover:scale-105 hover:shadow"
-          :class="{'disabled': disabled.buttonImport}"
+          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
+          :class="{'disabled cursor-not-allowed': disabled.buttonImport, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !disabled.buttonImport}"
           :disabled="disabled.buttonImport"
           @click="showImportExcel">
           Import
@@ -100,8 +102,8 @@
         <button 
           id="button-tambah"
           type="button" 
-          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out hover:bg-gray-300 hover:scale-105 hover:shadow"
-          :class="{'disabled': disabled.buttonTambah}"
+          class="w-24 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
+          :class="{'disabled cursor-not-allowed': disabled.buttonTambah, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !disabled.buttonTambah}"
           :disabled="disabled.buttonTambah"
           @click="showViewAddStudent">
           Tambah
@@ -298,6 +300,7 @@ export default {
         buttonExport: false,
         buttonImport: false,
         buttonPagination: false,
+        buttonExportLargeCSV: false,
       }, 
       modalEmailComponent: {
         show: false,
@@ -320,14 +323,23 @@ export default {
 
   methods: {
     exportLargeCSV() {
-      this.$store
-          .dispatch('exportLargeCSV')
-          .then(response => {
-            ElNotification({ type: 'success', title: 'Success', message: response.data.message });
-          })
-          .catch(error => {
-            ElNotification({ type: 'error', title: 'Error', message: error.response.data.message });
-          })
+      Swal.fire({
+        icon: "question",
+        title: "Do You Want To Export Data Large?",
+        confirmButtonText: "Exports",  
+      })
+      .then(result => {
+        if (result.isConfirmed) {
+          this.$store
+              .dispatch('exportLargeCSV')
+              .then(response => {
+                ElNotification({ type: 'success', title: 'Success', message: response.data.message });
+              })
+              .catch(error => {
+                ElNotification({ type: 'error', title: 'Error', message: error.response.data.message });
+              })
+        }
+      });
     },
 
     FormAddStudent_CancelProcess() {
