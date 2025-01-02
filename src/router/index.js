@@ -81,10 +81,8 @@ router.beforeEach((to, from, next) => {
                     global.isExportingLargeCSV = response.data.isExportingLargeCSV;
                     if(response.data.dataFormat != '') {
                       ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                      setTimeout(() => {
-                        localStorage.setItem('jidantest', response.data.dataFormat.link)
-                        document.location = response.data.dataFormat.link
-                      }, 3000);
+                      localStorage.setItem('jidantest', response.data.dataFormat.link)
+                      document.location = response.data.dataFormat.link
                     }
                    });
               // fetch notification
@@ -119,10 +117,8 @@ router.beforeEach((to, from, next) => {
                   global.isExportingLargeCSV = response.data.isExportingLargeCSV;
                   if(response.data.dataFormat != '') {
                     ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                    setTimeout(() => {
-                      localStorage.setItem('jidantest', response.data.dataFormat.link)
-                      document.location = response.data.dataFormat.link
-                    }, 3000);
+                    localStorage.setItem('jidantest', response.data.dataFormat.link)
+                    document.location = response.data.dataFormat.link
                   }
                  });
             // fetch notification
