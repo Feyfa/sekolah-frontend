@@ -69,23 +69,37 @@ router.beforeEach((to, from, next) => {
       // cek validasi tokennya
       axios.get('/tokenvalidation')
            // jika token valid, maka paksa di ke wilayah yang udah di autentikasi
-           .then(response => {
+           .then(async response => {
             // console.log(response)
             // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
             if(response.status === 200 && response.data.message === 'token valid') {
-              next({name: 'home'});
+              // fetch notification
+              try {
+                const response = axios.get('/notification/export-large-csv');
+                global.isExportingLargeCSV = response.data.isExportingLargeCSV;
+                if(response.data.dataFormat != '') {
+                  ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
+                  document.location = response.data.dataFormat.link
+                }
+                next();
+              } catch (error) {
+                next();
+              }
+              // fetch notification
 
-              // fetch notification
-              axios.get('/notification/export-large-csv')
-                   .then(response => {
-                    global.isExportingLargeCSV = response.data.isExportingLargeCSV;
-                    if(response.data.dataFormat != '') {
-                      ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                      // document.location = response.data.dataFormat.link
-                      window.location.replace(response.data.dataFormat.link);
-                    }
-                   });
-              // fetch notification
+              // next({name: 'home'});
+
+              // // fetch notification
+              // axios.get('/notification/export-large-csv')
+              //      .then(response => {
+              //       global.isExportingLargeCSV = response.data.isExportingLargeCSV;
+              //       if(response.data.dataFormat != '') {
+              //         ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
+              //         // document.location = response.data.dataFormat.link
+              //         window.location.replace(response.data.dataFormat.link);
+              //       }
+              //      });
+              // // fetch notification
             }
            })
            // jika token tidak valid, maka yaudah biarkan saja ke halaman register atau login 
@@ -105,23 +119,38 @@ router.beforeEach((to, from, next) => {
     // cek validasi tokennya
     axios.get('/tokenvalidation')
          // jika token valid, maka yaudah biarkan saja ke halaman yang dia ingin tuju
-         .then(response => {
+         .then(async response => {
           console.log(response)
           // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
           if(response.status === 200 && response.data.message === 'token valid') {
-            next();
-
             // fetch notification
-            axios.get('/notification/export-large-csv')
-                 .then(response => {
-                  global.isExportingLargeCSV = response.data.isExportingLargeCSV;
-                  if(response.data.dataFormat != '') {
-                    ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                    // document.location = response.data.dataFormat.link
-                    window.location.replace(response.data.dataFormat.link);
-                  }
-                 });
-          // fetch notification
+            try {
+              const response = axios.get('/notification/export-large-csv');
+              global.isExportingLargeCSV = response.data.isExportingLargeCSV;
+              if(response.data.dataFormat != '') {
+                ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
+                document.location = response.data.dataFormat.link
+              }
+              next();
+            } catch (error) {
+              next();
+            }
+            // fetch notification
+            
+            
+            // next();
+
+            // // fetch notification
+            // axios.get('/notification/export-large-csv')
+            //      .then(response => {
+            //       global.isExportingLargeCSV = response.data.isExportingLargeCSV;
+            //       if(response.data.dataFormat != '') {
+            //         ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
+            //         // document.location = response.data.dataFormat.link
+            //         window.location.replace(response.data.dataFormat.link);
+            //       }
+            //      });
+            // // fetch notification
           }
          })
          // jika token tidak valid, maka paksa di ke wilayah yang belm di autentikasi
