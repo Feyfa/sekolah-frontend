@@ -71,7 +71,7 @@ router.beforeEach((to, from, next) => {
            // jika token valid, maka paksa di ke wilayah yang udah di autentikasi
            .then(response => {
             // console.log(response)
-            document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
+            // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
             if(response.status === 200 && response.data.message === 'token valid') {
               next({name: 'home'});
 
@@ -106,7 +106,7 @@ router.beforeEach((to, from, next) => {
          // jika token valid, maka yaudah biarkan saja ke halaman yang dia ingin tuju
          .then(response => {
           console.log(response)
-          document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
+          // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
           if(response.status === 200 && response.data.message === 'token valid') {
             next();
 
