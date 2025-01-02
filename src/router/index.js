@@ -75,7 +75,7 @@ router.beforeEach((to, from, next) => {
             if(response.status === 200 && response.data.message === 'token valid') {
               // fetch notification
               try {
-                const response = axios.get('/notification/export-large-csv');
+                const response = await axios.get('/notification/export-large-csv');
                 global.isExportingLargeCSV = response.data.isExportingLargeCSV;
                 if(response.data.dataFormat != '') {
                   ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
@@ -125,7 +125,7 @@ router.beforeEach((to, from, next) => {
           if(response.status === 200 && response.data.message === 'token valid') {
             // fetch notification
             try {
-              const response = axios.get('/notification/export-large-csv');
+              const response = await axios.get('/notification/export-large-csv');
               global.isExportingLargeCSV = response.data.isExportingLargeCSV;
               if(response.data.dataFormat != '') {
                 ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
