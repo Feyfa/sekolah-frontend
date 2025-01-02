@@ -113,6 +113,7 @@
 
 <script>
 import Swal from "sweetalert2";
+import { ElNotification } from 'element-plus';
 
 export default {
   props: {
@@ -222,10 +223,7 @@ export default {
             /* UNTUK PAGINATION, SETELAH MENAMBAHKAN MURID, AKAN DI ARAH KAN KE PAGE TERBARU */
             
             this.clearInputForm();
-            this.$alert({
-              status: 'success',
-              message: response.data.message
-            });
+            ElNotification({ type: 'success', title: 'Success', message: response.data.message });
 
             this.$emit('onAfterProcessSuccess');
           }
@@ -248,10 +246,7 @@ export default {
             this.disabled = false;
             $('#button-save').html('Save');
 
-            this.$alert({
-              status: 'error',
-              message: error.response.data.message.email[0]
-            });
+            ElNotification({ type: 'error', title: 'Error', message: error.response.data.message.email[0] });
 
             this.$emit('onAfterProcessError');
           }

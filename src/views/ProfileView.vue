@@ -330,6 +330,7 @@
 </template>
 
 <script>
+import { ElNotification } from 'element-plus';
 import Swal from 'sweetalert2';
 import UserImage from "@/assets/imgs/user.jpg"
 
@@ -418,20 +419,14 @@ export default {
       {
         $('#image-file').val('');
         this.isCLickDropdown = false;
-        this.$alert({
-          status: 'error',
-          message: `The foto field must be an image`
-        });
+        ElNotification({ type: 'error', title: 'Error', message: 'The foto field must be an image' });
       }
       // jika file di atas 1mb
       else if(!sizeValid)
       {
         $('#image-file').val('');
         this.isCLickDropdown = false;
-        this.$alert({
-          status: 'error',
-          message: `The foto field must not be greater than 1024 kilobytes`
-        });
+        ElNotification({ type: 'error', title: 'Error', message: 'The foto field must not be greater than 1024 kilobytes' });
       }
       else
       {
@@ -447,10 +442,7 @@ export default {
                     this.isProcessUserImage = false;
 
                     if(response.data.status === 200) {
-                      this.$alert({
-                        status: 'success',
-                        message: response.data.message
-                      });
+                      ElNotification({ type: 'success', title: 'Success', message: response.data.message });
                       
                       localStorage.setItem('user', JSON.stringify(response.data.user));
                       localStorage.setItem('userImage', JSON.stringify(response.data.userImage));
@@ -468,10 +460,7 @@ export default {
                     let errorMessage = Object.values(error.response.data.message);
                     errorMessage = errorMessage.join(',');
 
-                    this.$alert({
-                      status: 'error',
-                      message: errorMessage
-                    })
+                    ElNotification({ type: 'error', title: 'Error', message: errorMessage });
                    })
       }
     },
@@ -500,10 +489,7 @@ export default {
               this.isProcessUserImage = false;
   
               if(response.data.status === 200) {
-                this.$alert({
-                  status: 'success',
-                  message: response.data.message
-                });
+                ElNotification({ type: 'success', title: 'Success', message: response.data.message });
 
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 localStorage.setItem('userImage', JSON.stringify(response.data.userImage));
@@ -545,10 +531,7 @@ export default {
             this.isEdit.user = false;
             this.loading.user = false;
 
-            this.$alert({
-              status: 'success',
-              message: response.data.message
-            })
+            ElNotification({ type: 'success', title: 'Success', message: response.data.message });
 
             localStorage.setItem('user', JSON.stringify(response.data.user));
           }
@@ -562,10 +545,7 @@ export default {
           let errorMessage = Object.values(error.response.data.message);
           errorMessage = errorMessage.join(',');
 
-          this.$alert({
-            status: 'error',
-            message: errorMessage
-          })
+          ElNotification({ type: 'error', title: 'Error', message: errorMessage });
         });
       }
     },
@@ -608,10 +588,7 @@ export default {
           if(response.status === 200) {
             this.isEdit.email = false;
             this.loading.email = false;
-            this.$alert({
-              status: 'success',
-              message: response.data.message
-            })
+            ElNotification({ type: 'success', title: 'Success', message: response.data.message });
             localStorage.setItem('user', JSON.stringify(response.data.user));
           }
         })

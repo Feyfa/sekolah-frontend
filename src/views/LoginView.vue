@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import { ElNotification } from 'element-plus';
 import Swal from "sweetalert2";
 import { RouterLink } from "vue-router";
 import UserImage from "@/assets/imgs/user.jpg";
@@ -134,10 +135,7 @@ export default {
             this.buttonloginDisabled = false;
             $('#button-login').html('Login');
 
-            this.$alert({
-              status: 'error',
-              message: error.response.data.message
-            });
+            ElNotification({ type: 'error', title: 'Error', message: error.response.data.message });
           }
         });
       }

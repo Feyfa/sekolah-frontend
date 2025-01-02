@@ -75,8 +75,8 @@
           id="button-large-export"
           type="button"
           class="w-28 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
-          :class="{'disabled cursor-not-allowed': disabled.buttonExportLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !disabled.buttonExportLargeCSV}"
-          :disabled="disabled.buttonExportLargeCSV"
+          :class="{'disabled cursor-not-allowed': $global.isExportingLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !$global.isExportingLargeCSV}"
+          :disabled="$global.isExportingLargeCSV"
           @click="exportLargeCSV">
           Export Large
         </button>
@@ -333,6 +333,7 @@ export default {
           this.$store
               .dispatch('exportLargeCSV')
               .then(response => {
+                this.$global.isExportingLargeCSV = true;
                 ElNotification({ type: 'success', title: 'Success', message: response.data.message });
               })
               .catch(error => {
@@ -397,10 +398,7 @@ export default {
         this.modalEmailComponent.show = true;
         this.modalEmailComponent.to = email;
       } else {
-        this.$alert({
-          status: 'error',
-          message: 'Your email settings are not complete <a href="/profile#email-setting" class="underline">click here</a>'
-        })
+        ElNotification({ type: 'error', title: 'Error', message: 'Your email settings are not complete <a href="/profile#email-setting" class="underline">click here</a>' });
       }
     },
 
@@ -455,10 +453,7 @@ export default {
             this.disabled.buttonExport = false;
             $('#button-export').html('Export');
 
-            this.$alert({
-              status: 'success',
-              message: 'Export Students Successfully'
-            });
+            ElNotification({ type: 'success', title: 'Success', message: 'Export Students Successfully' });
           })
           .catch(error => {
             console.error(error);
@@ -604,10 +599,7 @@ export default {
         if(response.data.status === 200 && response.data.message === 'Student Update Successfully') {
           this.rowEdit = null;
           this.getStudents();
-          this.$alert({
-            status: 'success',
-            message: response.data.message
-          });
+          ElNotification({ type: 'success', title: 'Success', message: response.data.message });
         }
       })
       .catch(error => {
@@ -625,11 +617,7 @@ export default {
           });
         }
         else {
-          this.$alert({
-            status: 'error',
-            // memisahkan banyak array menjadi 1 string, ['name required.'], ['email required.'] menjadi  "name required. email required."
-            message: Object.values(error.response.data.message).flat().join(' '),
-          });
+          ElNotification({ type: 'error', title: 'Error', message: Object.values(error.response.data.message).flat().join(' ') });
         }
       });
     },  
@@ -664,10 +652,7 @@ export default {
               
               this.isProcess.deleteStudent[index] = false;
 
-              this.$alert({
-                status: 'success',
-                message: 'Delete Student Succesfully'
-              });
+              ElNotification({ type: 'success', title: 'Success', message: 'Delete Student Succesfully' });
             }
           })
           .catch(error => {

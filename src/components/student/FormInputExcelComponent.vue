@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { ElNotification } from 'element-plus';
+
 export default {
   props: {
     isClickButtonImport: {
@@ -60,10 +62,7 @@ export default {
                     $('#message-file').html('Upload File xlsx');
                     $('#dropzone-file').val('');
 
-                    this.$alert({
-                      status: 'success',
-                      message: response.data.message
-                    });
+                    ElNotification({ type: 'success', title: 'Success', message: response.data.message });
 
                     this.$emit('onAfterProcessSuccess');
                    })
@@ -78,19 +77,13 @@ export default {
                     let errorMessage = Object.values(error.response.data.message);
                     errorMessage = errorMessage.join(',');
 
-                    this.$alert({
-                      status: 'error',
-                      message: errorMessage
-                    });
+                    ElNotification({ type: 'error', title: 'Error', message: errorMessage });
 
                     this.$emit('onAfterProcessError');
                    });
       } 
       else {
-        this.$alert({
-          status: 'error',
-          message: 'file not xlsx'
-        });
+        ElNotification({ type: 'error', title: 'Error', message: 'file not xlsx' });
       }
     },
   }

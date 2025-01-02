@@ -57,6 +57,7 @@
 
 
 <script>
+import { ElNotification } from 'element-plus';
 import Swal from 'sweetalert2';
 
 export default {
@@ -106,10 +107,8 @@ export default {
         $('#buttonSendEmail').html('Send Email');
 
         if(response.status === 200) {
-          this.$alert({
-            status: 'success',
-            message: response.data.message
-          });
+          ElNotification({ type: 'success', title: 'Success', message: response.data.message });
+          
           this.hiddenModalEmailComponent();
         }
       })

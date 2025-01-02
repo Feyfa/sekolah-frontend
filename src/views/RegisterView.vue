@@ -69,6 +69,7 @@
 
 <script>
 import Swal from "sweetalert2";
+import { ElNotification } from 'element-plus';
 import { RouterLink } from "vue-router";
 
 export default {
@@ -143,10 +144,7 @@ export default {
             this.buttonRegisterDisabled = false;
             $('#button-register').html('Register');
 
-            this.$alert({
-              status: 'error',
-              message: error.response.data.message
-            });
+            ElNotification({ type: 'error', title: 'Error', message: error.response.data.message });
           }
         });
       }

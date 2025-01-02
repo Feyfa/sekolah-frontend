@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import axios from '@/axios';
 import store from '@/store';
+import global from '@/global';
 import { ElNotification } from 'element-plus';
 
 const router = createRouter({
@@ -76,6 +77,7 @@ router.beforeEach((to, from, next) => {
               // fetch notification
               axios.get('/notification/export-large-csv')
                    .then(response => {
+                    global.isExportingLargeCSV = response.data.isExportingLargeCSV;
                     if(response.data.dataFormat != '') {
                       ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
                       document.location = response.data.dataFormat.link
@@ -109,6 +111,7 @@ router.beforeEach((to, from, next) => {
             // fetch notification
             axios.get('/notification/export-large-csv')
                  .then(response => {
+                  global.isExportingLargeCSV = response.data.isExportingLargeCSV;
                   if(response.data.dataFormat != '') {
                     ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
                     document.location = response.data.dataFormat.link
