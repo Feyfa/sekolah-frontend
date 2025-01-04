@@ -50,6 +50,40 @@ const router = createRouter({
   ]
 });
 
+function downloadFile(link) {
+  const linkEl = document.createElement('a');
+  linkEl.href = link;
+  linkEl.download = '';
+  document.body.appendChild(linkEl);
+
+  linkEl.click();
+  document.body.removeChild(linkEl);
+}
+
+async function showNotifications(notifications) {
+  for (const item of notifications) {
+    if (item.name === 'download') {
+      downloadFile(item.data.link);
+
+      ElNotification({
+        type: item.status,
+        title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+        message: item.message,
+        showClose: false,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } else {
+      ElNotification({
+        type: item.status,
+        title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+        message: item.message,
+        showClose: false,
+      });
+    }
+  }
+}
+
 router.beforeEach((to, from, next) => {
   store.dispatch('fetchUserFromLocalStorage');
   store.dispatch('fetchimgFileFromLocalStorage');
@@ -71,21 +105,14 @@ router.beforeEach((to, from, next) => {
            // jika token valid, maka paksa di ke wilayah yang udah di autentikasi
            .then(response => {
             // console.log(response)
-            // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
             if(response.status === 200 && response.data.message === 'token valid') {
-              next({name: 'home'});
+              global.isExportingLargeCSV = response.data.isExporting.largeCSV;
 
-              // fetch notification
-              axios.get('/notification/export-large-csv')
-                   .then(response => {
-                    global.isExportingLargeCSV = response.data.isExportingLargeCSV;
-                    if(response.data.dataFormat != '') {
-                      ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                      localStorage.setItem('jidantest', response.data.dataFormat.link)
-                      document.location = response.data.dataFormat.link
-                    }
-                   });
-              // fetch notification
+              // notification
+              showNotifications(response.data.notifications);
+              // notification
+
+              next({name: 'home'});
             }
            })
            // jika token tidak valid, maka yaudah biarkan saja ke halaman register atau login 
@@ -106,22 +133,15 @@ router.beforeEach((to, from, next) => {
     axios.get('/tokenvalidation')
          // jika token valid, maka yaudah biarkan saja ke halaman yang dia ingin tuju
          .then(response => {
-          console.log(response)
-          // document.location = 'https://midnightblue-stingray-566913.hostingersite.com/download/datalarge-100000row-e44d10884b.csv';
+          // console.log(response)
           if(response.status === 200 && response.data.message === 'token valid') {
-            next();
+            global.isExportingLargeCSV = response.data.isExporting.largeCSV;
 
-            // fetch notification
-            axios.get('/notification/export-large-csv')
-                 .then(response => {
-                  global.isExportingLargeCSV = response.data.isExportingLargeCSV;
-                  if(response.data.dataFormat != '') {
-                    ElNotification({ type: 'success', title: 'Success', message: response.data.dataFormat.message });
-                    localStorage.setItem('jidantest', response.data.dataFormat.link)
-                    document.location = response.data.dataFormat.link
-                  }
-                 });
-            // fetch notification
+            // notification
+            showNotifications(response.data.notifications);
+            // notification
+            
+            next();
           }
          })
          // jika token tidak valid, maka paksa di ke wilayah yang belm di autentikasi

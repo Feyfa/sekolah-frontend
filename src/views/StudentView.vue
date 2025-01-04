@@ -74,11 +74,12 @@
         <button 
           id="button-large-export"
           type="button"
-          class="w-28 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out"
+          class="w-max-40 px-3 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out flex justify-center items-center gap-2"
           :class="{'disabled cursor-not-allowed': $global.isExportingLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !$global.isExportingLargeCSV}"
           :disabled="$global.isExportingLargeCSV"
           @click="exportLargeCSV">
           Export Large
+          <i v-if="$global.isExportingLargeCSV" class="fas fa-spinner fa-pulse"></i>
         </button>
         <button 
           id="button-export"
