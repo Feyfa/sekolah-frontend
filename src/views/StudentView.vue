@@ -331,13 +331,14 @@ export default {
       })
       .then(result => {
         if (result.isConfirmed) {
+          this.$global.isExportingLargeCSV = true;
           this.$store
               .dispatch('exportLargeCSV')
               .then(response => {
-                this.$global.isExportingLargeCSV = true;
                 ElNotification({ type: 'success', title: 'Success', message: response.data.message });
               })
               .catch(error => {
+                this.$global.isExportingLargeCSV = false;
                 ElNotification({ type: 'error', title: 'Error', message: error.response.data.message });
               })
         }
