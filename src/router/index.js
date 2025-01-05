@@ -50,11 +50,11 @@ const router = createRouter({
   ]
 });
 
-async function showNotifications(notifications) {
+function showNotifications(notifications) {
   for (const item of notifications) {
     if (item.name === 'download') {
       try {
-        const response = await axios.get(item.data.link, { responseType: 'blob' });
+        const response = axios.get(item.data.link, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const linkEl = document.createElement('a');
         
