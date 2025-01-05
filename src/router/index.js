@@ -50,29 +50,37 @@ const router = createRouter({
   ]
 });
 
-function downloadFile(link) {
-  const linkEl = document.createElement('a');
-  linkEl.href = link;
-  linkEl.download = '';
-  document.body.appendChild(linkEl);
-
-  linkEl.click();
-  document.body.removeChild(linkEl);
-}
-
 async function showNotifications(notifications) {
   for (const item of notifications) {
     if (item.name === 'download') {
-      downloadFile(item.data.link);
+      try {
+        const response = await axios.get(item.data.link, { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const linkEl = document.createElement('a');
+        
+        linkEl.href = url;
+        linkEl.download = item.data.link.split('/').pop();
+        document.body.appendChild(linkEl);
+        linkEl.click();
+        document.body.removeChild(linkEl);
+        window.URL.revokeObjectURL(url);
 
-      ElNotification({
-        type: item.status,
-        title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-        message: item.message,
-        showClose: false,
-      });
+        ElNotification({
+          type: item.status,
+          title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+          message: item.message,
+          showClose: false,
+        });
+      } catch (error) {
+        global.isExportingLargeCSV = false;
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
+        ElNotification({
+          type: 'error',
+          title: 'Error',
+          message: 'export csv failed',
+          showClose: false,
+        });
+      }
     } else {
       ElNotification({
         type: item.status,
