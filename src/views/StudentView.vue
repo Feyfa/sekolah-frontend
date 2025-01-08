@@ -78,7 +78,7 @@
           :class="{'disabled cursor-not-allowed': $global.isExportingLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !$global.isExportingLargeCSV}"
           :disabled="$global.isExportingLargeCSV"
           @click="exportLargeCSV">
-          Export Large
+          Download Unserved Leads
           <i v-if="$global.isExportingLargeCSV" class="fas fa-spinner fa-pulse"></i>
         </button>
         <button 
@@ -326,7 +326,7 @@ export default {
     exportLargeCSV() {
       Swal.fire({
         icon: "question",
-        title: "Do You Want To Export Data Large?",
+        title: "Do You Want To Download Unserved Leads?",
         confirmButtonText: "Exports",  
       })
       .then(result => {
