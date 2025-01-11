@@ -53,11 +53,11 @@ const router = createRouter({
 async function showNotifications(notifications) {
   for (const item of notifications) {
     if (item.name === 'download') {
-      /* CARA BARU */
       const downloadLink = item.data.link; 
       const linkEl = document.createElement('a');
+      
       linkEl.href = downloadLink;
-      linkEl.download = downloadLink.split('/').pop(); // Nama file
+      linkEl.download = downloadLink.split('/').pop(); 
       linkEl.style.display = 'none';
       document.body.appendChild(linkEl);
       linkEl.click();
@@ -71,38 +71,6 @@ async function showNotifications(notifications) {
       });
 
       await new Promise(resolve => setTimeout(resolve, 300));
-      /* CARA BARU */
-
-      // /* CARA LAMA */
-      // try {
-      //   const response = await axios.get(item.data.link, { responseType: 'blob' });
-      //   const url = window.URL.createObjectURL(new Blob([response.data]));
-      //   const linkEl = document.createElement('a');
-        
-      //   linkEl.href = url;
-      //   linkEl.download = item.data.link.split('/').pop();
-      //   document.body.appendChild(linkEl);
-      //   linkEl.click();
-      //   document.body.removeChild(linkEl);
-      //   window.URL.revokeObjectURL(url);
-
-      //   ElNotification({
-      //     type: item.status,
-      //     title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-      //     message: item.message,
-      //     showClose: false,
-      //   });
-      // } catch (error) {
-      //   global.isExportingLargeCSV = false;
-
-      //   ElNotification({
-      //     type: 'error',
-      //     title: 'Error',
-      //     message: 'export csv failed',
-      //     showClose: false,
-      //   });
-      // }
-      // /* CARA LAMA */
     } else {
       ElNotification({
         type: item.status,
