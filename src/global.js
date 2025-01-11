@@ -8,6 +8,9 @@ const global = reactive({
         navbar: false
     },
     isExportingLargeCSV: false,
+
+    getNotificationExportSetTimeout: null,
+    getNotificationExportSetInterval: null,
 });
 
 export default global;

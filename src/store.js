@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import axios from "@/axios";
+import { ElNotification } from "element-plus";
 
 export default createStore({
   state: {
@@ -31,6 +32,37 @@ export default createStore({
               reject(error);
              })
       })
+    },
+
+    async showNotifications(context, data) {
+      const notifications = data.notifications;
+      for (const item of notifications) {
+        if (item.name === 'download') {
+          const downloadLink = item.data.link; 
+          const linkEl = document.createElement('a');
+          
+          linkEl.href = downloadLink;
+          linkEl.download = downloadLink.split('/').pop(); 
+          linkEl.style.display = 'none';
+          document.body.appendChild(linkEl);
+          linkEl.click();
+          document.body.removeChild(linkEl);
+    
+          ElNotification({
+            type: item.status,
+            title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+            message: item.message,
+          });
+    
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } else {
+          ElNotification({
+            type: item.status,
+            title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+            message: item.message
+          });
+        }
+      }
     },
 
     exportLargeCSV(context, data) {

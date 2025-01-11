@@ -254,6 +254,7 @@
 </template>
 
 <script>
+import axios from '@/axios';
 import Swal from 'sweetalert2';
 import ModalEmailComponent from '@/components/student/ModalEmailComponent.vue';
 import FormInputExcelComponent from "@/components/student/FormInputExcelComponent.vue";
@@ -335,6 +336,31 @@ export default {
           this.$store
               .dispatch('exportLargeCSV')
               .then(response => {
+                clearTimeout(this.$global.getNotificationExportSetTimeout);
+                clearInterval(this.$global.getNotificationExportSetInterval);
+
+                this.$global.getNotificationExportSetTimeout = setTimeout(() => {
+                  this.$global.getNotificationExportSetInterval = setInterval(() => {
+                    axios.get('/notification/export/csv')
+                        .then(response => {
+                          this.$global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+                          if(response.data.notificationDownloadTotal > 0 && !this.$global.isExportingLargeCSV) {
+                            if(response.data.notifications.length > 0) {
+                              // notification
+                              this.$store.dispatch('showNotifications', {notifications: response.data.notifications});
+                              // notification
+
+                              clearTimeout(this.$global.getNotificationExportSetTimeout);
+                              clearInterval(this.$global.getNotificationExportSetInterval);
+                            }
+                          } else if(response.data.notificationDownloadTotal == 0) {
+                            clearTimeout(this.$global.getNotificationExportSetTimeout);
+                            clearInterval(this.$global.getNotificationExportSetInterval);
+                          }
+                        });
+                  }, 10000);
+                }, 10000);
+                
                 ElNotification({ type: 'success', title: 'Success', message: response.data.message });
               })
               .catch(error => {

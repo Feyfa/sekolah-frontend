@@ -50,44 +50,16 @@ const router = createRouter({
   ]
 });
 
-async function showNotifications(notifications) {
-  for (const item of notifications) {
-    if (item.name === 'download') {
-      const downloadLink = item.data.link; 
-      const linkEl = document.createElement('a');
-      
-      linkEl.href = downloadLink;
-      linkEl.download = downloadLink.split('/').pop(); 
-      linkEl.style.display = 'none';
-      document.body.appendChild(linkEl);
-      linkEl.click();
-      document.body.removeChild(linkEl);
-
-      ElNotification({
-        type: item.status,
-        title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-        message: item.message,
-        showClose: false,
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 300));
-    } else {
-      ElNotification({
-        type: item.status,
-        title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-        message: item.message,
-        showClose: false,
-      });
-    }
-  }
-}
-
 router.beforeEach((to, from, next) => {
   store.dispatch('fetchUserFromLocalStorage');
   store.dispatch('fetchimgFileFromLocalStorage');
 
   // ambil token
   const token = localStorage.getItem('token');
+
+  // reset settimout and interval
+  clearTimeout(global.getNotificationExportSetTimeout);
+  clearInterval(global.getNotificationExportSetInterval);
 
   // kondisi ketika belum login token masih belum ada
   if(!to.meta.public && !token) {
@@ -105,10 +77,38 @@ router.beforeEach((to, from, next) => {
             // console.log(response)
             if(response.status === 200 && response.data.message === 'token valid') {
               global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+  
+              if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
+                // notification
+                store.dispatch('showNotifications', {notifications: response.data.notifications});
+                // notification
+              } else if(response.data.notificationDownloadTotal > 0 && global.isExportingLargeCSV) {
+                clearTimeout(global.getNotificationExportSetTimeout);
+                clearInterval(global.getNotificationExportSetInterval);
 
-              // notification
-              showNotifications(response.data.notifications);
-              // notification
+                global.getNotificationExportSetTimeout = setTimeout(() => {
+                  global.getNotificationExportSetInterval = setInterval(() => {
+                    axios.get('/notification/export/csv')
+                         .then(response => {
+                          global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+
+                          if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
+                            if(response.data.notifications.length > 0) {
+                              // notification
+                              store.dispatch('showNotifications', {notifications: response.data.notifications});
+                              // notification
+
+                              clearTimeout(global.getNotificationExportSetTimeout);
+                              clearInterval(global.getNotificationExportSetInterval);
+                            }
+                          } else if(response.data.notificationDownloadTotal == 0) {
+                            clearTimeout(global.getNotificationExportSetTimeout);
+                            clearInterval(global.getNotificationExportSetInterval);
+                          }
+                         });
+                  }, 10000);
+                }, 10000);
+              }
 
               next({name: 'home'});
             }
@@ -135,9 +135,37 @@ router.beforeEach((to, from, next) => {
           if(response.status === 200 && response.data.message === 'token valid') {
             global.isExportingLargeCSV = response.data.isExporting.largeCSV;
 
-            // notification
-            showNotifications(response.data.notifications);
-            // notification
+            if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
+              // notification
+              store.dispatch('showNotifications', {notifications: response.data.notifications});
+              // notification
+            } else if(response.data.notificationDownloadTotal > 0 && global.isExportingLargeCSV) {
+              clearTimeout(global.getNotificationExportSetTimeout);
+              clearInterval(global.getNotificationExportSetInterval);
+
+              global.getNotificationExportSetTimeout = setTimeout(() => {
+                global.getNotificationExportSetInterval = setInterval(() => {
+                  axios.get('/notification/export/csv')
+                       .then(response => {
+                        global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+
+                        if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
+                          if(response.data.notifications.length > 0) {
+                            // notification
+                            store.dispatch('showNotifications', {notifications: response.data.notifications});
+                            // notification
+
+                            clearTimeout(global.getNotificationExportSetTimeout);
+                            clearInterval(global.getNotificationExportSetInterval);
+                          }
+                        } else if(response.data.notificationDownloadTotal == 0) {
+                          clearTimeout(global.getNotificationExportSetTimeout);
+                          clearInterval(global.getNotificationExportSetInterval);
+                        }
+                       });
+                }, 10000);
+              }, 10000);
+            }
             
             next();
           }
