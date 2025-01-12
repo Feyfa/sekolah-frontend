@@ -34,46 +34,40 @@ export default createStore({
       })
     },
 
-    async showNotifications(context, data) {
-      const notifications = data.notifications;
-      for (const item of notifications) {
-        if (item.name === 'download') {
-          const downloadLink = item.data.link; 
-          const linkEl = document.createElement('a');
-          
-          linkEl.href = downloadLink;
-          linkEl.download = downloadLink.split('/').pop(); 
-          linkEl.style.display = 'none';
-          document.body.appendChild(linkEl);
-          linkEl.click();
-          document.body.removeChild(linkEl);
-    
-          ElNotification({
-            type: item.status,
-            title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-            message: item.message,
-          });
-    
-          await new Promise(resolve => setTimeout(resolve, 300));
-        } else {
-          ElNotification({
-            type: item.status,
-            title: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-            message: item.message
-          });
-        }
+    async processDownloadCSV(context, data) {
+      const downloadProgressDone = data.downloadProgressDone;
+      for (const item of downloadProgressDone) {
+        const downloadLink = item.link; 
+        const linkEl = document.createElement('a');
+        
+        linkEl.href = downloadLink;
+        linkEl.download = downloadLink.split('/').pop(); 
+        linkEl.style.display = 'none';
+        document.body.appendChild(linkEl);
+        linkEl.click();
+        document.body.removeChild(linkEl);
+  
+        ElNotification({
+          type: 'success',
+          title: 'Success',
+          message: 'Download File CSV Success',
+        });
+  
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
     },
 
     exportLargeCSV(context, data) {
       return new Promise((resolve, reject) => {
-        axios.get('/large/export/csv')
-             .then(response => {
-              resolve(response);
-             })
-             .catch(error => {
-              reject(error);
-             })
+        axios.post('/large/export/csv', {
+          user_id: data.user_id
+        })
+        .then(response => {
+          resolve(response);
+        })
+        .catch(error => {
+          reject(error);
+        })
       });
     },  
 

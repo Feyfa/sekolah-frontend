@@ -58,8 +58,8 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
 
   // reset settimout and interval
-  clearTimeout(global.getNotificationExportSetTimeout);
-  clearInterval(global.getNotificationExportSetInterval);
+  clearTimeout(global.getDownloadProgressSetTimeout);
+  clearInterval(global.getDownloadProgressSetInterval);
 
   // kondisi ketika belum login token masih belum ada
   if(!to.meta.public && !token) {
@@ -70,44 +70,49 @@ router.beforeEach((to, from, next) => {
   else if (to.path === '/register' || to.path === '/login') {
     // kondisi sudah ada token, mau ke url register dan login, 
     if(token) {
+      const user_id = (store.getters.user != '') ? store.getters.user.id : '';
       // cek validasi tokennya
-      axios.get('/tokenvalidation')
+      axios.get('/tokenvalidation', { params: { user_id: user_id } })
            // jika token valid, maka paksa di ke wilayah yang udah di autentikasi
            .then(response => {
             // console.log(response)
             if(response.status === 200 && response.data.message === 'token valid') {
-              global.isExportingLargeCSV = response.data.isExporting.largeCSV;
-  
-              if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
-                // notification
-                store.dispatch('showNotifications', {notifications: response.data.notifications});
-                // notification
-              } else if(response.data.notificationDownloadTotal > 0 && global.isExportingLargeCSV) {
-                clearTimeout(global.getNotificationExportSetTimeout);
-                clearInterval(global.getNotificationExportSetInterval);
 
-                global.getNotificationExportSetTimeout = setTimeout(() => {
-                  global.getNotificationExportSetInterval = setInterval(() => {
-                    axios.get('/notification/export/csv')
-                         .then(response => {
-                          global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+              if(response.data.downloadProgressTotal > 0) {
+                global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
 
-                          if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
-                            if(response.data.notifications.length > 0) {
-                              // notification
-                              store.dispatch('showNotifications', {notifications: response.data.notifications});
-                              // notification
-
-                              clearTimeout(global.getNotificationExportSetTimeout);
-                              clearInterval(global.getNotificationExportSetInterval);
+                if(response.data.downloadProgressDone.length > 0) {
+                  store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
+                }
+                
+                if(response.data.downloadProgressTotal == response.data.downloadProgressDone.length) {
+                  clearTimeout(global.getDownloadProgressSetTimeout);
+                  clearInterval(global.getDownloadProgressSetInterval);
+                } else {
+                  // jika progress downloadd ada dan belum ada yang selesai, lakukan cek lagi
+                  clearTimeout(global.getDownloadProgressSetTimeout);
+                  clearInterval(global.getDownloadProgressSetInterval);
+                
+                  global.getDownloadProgressSetTimeout = setTimeout(() => {
+                    global.getDownloadProgressSetInterval = setInterval(() => {
+                      axios.get('/notification/export/csv', { params: { user_id: store.getters.user.id } })
+                          .then(response => {
+                            if(response.data.downloadProgressTotal > 0) {
+                              global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
+                              
+                              if(response.data.downloadProgressDone > 0) {
+                                store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
+                              }
+                              
+                              if(response.data.downloadProgressTotal == response.data.downloadProgressDone.length) {
+                                clearTimeout(global.getDownloadProgressSetTimeout);
+                                clearInterval(global.getDownloadProgressSetInterval);
+                              }
                             }
-                          } else if(response.data.notificationDownloadTotal == 0) {
-                            clearTimeout(global.getNotificationExportSetTimeout);
-                            clearInterval(global.getNotificationExportSetInterval);
-                          }
-                         });
+                          });
+                    }, 10000);
                   }, 10000);
-                }, 10000);
+                }
               }
 
               next({name: 'home'});
@@ -127,44 +132,49 @@ router.beforeEach((to, from, next) => {
   }
   // kondisi masuk ke url selain /register dan /login dan memliki token
   else {
+    const user_id = (store.getters.user != '') ? store.getters.user.id : '';
     // cek validasi tokennya
-    axios.get('/tokenvalidation')
+    axios.get('/tokenvalidation', { params: { user_id: user_id } })
          // jika token valid, maka yaudah biarkan saja ke halaman yang dia ingin tuju
          .then(response => {
           // console.log(response)
           if(response.status === 200 && response.data.message === 'token valid') {
-            global.isExportingLargeCSV = response.data.isExporting.largeCSV;
 
-            if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
-              // notification
-              store.dispatch('showNotifications', {notifications: response.data.notifications});
-              // notification
-            } else if(response.data.notificationDownloadTotal > 0 && global.isExportingLargeCSV) {
-              clearTimeout(global.getNotificationExportSetTimeout);
-              clearInterval(global.getNotificationExportSetInterval);
+            if(response.data.downloadProgressTotal > 0) {
+              global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
 
-              global.getNotificationExportSetTimeout = setTimeout(() => {
-                global.getNotificationExportSetInterval = setInterval(() => {
-                  axios.get('/notification/export/csv')
-                       .then(response => {
-                        global.isExportingLargeCSV = response.data.isExporting.largeCSV;
+              if(response.data.downloadProgressDone.length > 0) {
+                store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
+              }
 
-                        if(response.data.notificationDownloadTotal > 0 && !global.isExportingLargeCSV) {
-                          if(response.data.notifications.length > 0) {
-                            // notification
-                            store.dispatch('showNotifications', {notifications: response.data.notifications});
-                            // notification
+              if(response.data.downloadProgressTotal == response.data.downloadProgressDone.length) {
+                clearTimeout(global.getDownloadProgressSetTimeout);
+                clearInterval(global.getDownloadProgressSetInterval);
+              } else {
+                // jika progress downloadd ada dan belum ada yang selesai, lakukan cek lagi
+                clearTimeout(global.getDownloadProgressSetTimeout);
+                clearInterval(global.getDownloadProgressSetInterval);
+              
+                global.getDownloadProgressSetTimeout = setTimeout(() => {
+                  global.getDownloadProgressSetInterval = setInterval(() => {
+                    axios.get('/notification/export/csv', { params: { user_id: store.getters.user.id } })
+                        .then(response => {
+                          if(response.data.downloadProgressTotal > 0) {
+                            global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
 
-                            clearTimeout(global.getNotificationExportSetTimeout);
-                            clearInterval(global.getNotificationExportSetInterval);
+                            if(response.data.downloadProgressDone > 0) {
+                              store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
+                            }
+
+                            if(response.data.downloadProgressTotal == response.data.downloadProgressDone.length) {
+                              clearTimeout(global.getDownloadProgressSetTimeout);
+                              clearInterval(global.getDownloadProgressSetInterval);
+                            }
                           }
-                        } else if(response.data.notificationDownloadTotal == 0) {
-                          clearTimeout(global.getNotificationExportSetTimeout);
-                          clearInterval(global.getNotificationExportSetInterval);
-                        }
-                       });
+                        });
+                  }, 10000);
                 }, 10000);
-              }, 10000);
+              }
             }
             
             next();

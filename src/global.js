@@ -7,10 +7,10 @@ const global = reactive({
         profile: false,
         navbar: false
     },
-    isExportingLargeCSV: false,
+    isDownloadFailedLead: false,
 
-    getNotificationExportSetTimeout: null,
-    getNotificationExportSetInterval: null,
+    getDownloadProgressSetTimeout: null,
+    getDownloadProgressSetInterval: null,
 });
 
 export default global;

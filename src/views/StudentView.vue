@@ -75,11 +75,11 @@
           id="button-large-export"
           type="button"
           class="w-max-40 px-3 py-1 bg-gray-200 border border-neutral-300 rounded shadow-sm transition-all duration-100 ease-in-out flex justify-center items-center gap-2"
-          :class="{'disabled cursor-not-allowed': $global.isExportingLargeCSV, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !$global.isExportingLargeCSV}"
-          :disabled="$global.isExportingLargeCSV"
+          :class="{'disabled cursor-not-allowed': $global.isDownloadFailedLead, 'hover:bg-gray-300 hover:scale-105 hover:shadow': !$global.isExportingLargeCSV}"
+          :disabled="$global.isDownloadFailedLead"
           @click="exportLargeCSV">
           Download Unserved Leads
-          <i v-if="$global.isExportingLargeCSV" class="fas fa-spinner fa-pulse"></i>
+          <i v-if="$global.isDownloadFailedLead" class="fas fa-spinner fa-pulse"></i>
         </button>
         <button 
           id="button-export"
@@ -332,30 +332,30 @@ export default {
       })
       .then(result => {
         if (result.isConfirmed) {
-          this.$global.isExportingLargeCSV = true;
+          this.$global.isDownloadFailedLead = true;
           this.$store
-              .dispatch('exportLargeCSV')
+              .dispatch('exportLargeCSV', {
+                user_id: this.$store.getters.user.id
+              })
               .then(response => {
-                clearTimeout(this.$global.getNotificationExportSetTimeout);
-                clearInterval(this.$global.getNotificationExportSetInterval);
-
-                this.$global.getNotificationExportSetTimeout = setTimeout(() => {
-                  this.$global.getNotificationExportSetInterval = setInterval(() => {
-                    axios.get('/notification/export/csv')
+                clearTimeout(this.$global.getDownloadProgressSetTimeout);
+                clearInterval(this.$global.getDownloadProgressSetInterval);
+              
+                this.$global.getDownloadProgressSetTimeout = setTimeout(() => {
+                  this.$global.getDownloadProgressSetInterval = setInterval(() => {
+                    axios.get('/notification/export/csv', { params: { user_id: this.$store.getters.user.id } })
                         .then(response => {
-                          this.$global.isExportingLargeCSV = response.data.isExporting.largeCSV;
-                          if(response.data.notificationDownloadTotal > 0 && !this.$global.isExportingLargeCSV) {
-                            if(response.data.notifications.length > 0) {
-                              // notification
-                              this.$store.dispatch('showNotifications', {notifications: response.data.notifications});
-                              // notification
+                          if(response.data.downloadProgressTotal > 0) {
+                            this.$global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
 
-                              clearTimeout(this.$global.getNotificationExportSetTimeout);
-                              clearInterval(this.$global.getNotificationExportSetInterval);
+                            if(response.data.downloadProgressDone.length > 0) {
+                              this.$store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
                             }
-                          } else if(response.data.notificationDownloadTotal == 0) {
-                            clearTimeout(this.$global.getNotificationExportSetTimeout);
-                            clearInterval(this.$global.getNotificationExportSetInterval);
+
+                            if(response.data.downloadProgressTotal == response.data.downloadProgressDone.length) {
+                              clearTimeout(this.$global.getDownloadProgressSetTimeout);
+                              clearInterval(this.$global.getDownloadProgressSetInterval);
+                            }
                           }
                         });
                   }, 10000);
