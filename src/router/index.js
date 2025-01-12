@@ -100,7 +100,7 @@ router.beforeEach((to, from, next) => {
                             if(response.data.downloadProgressTotal > 0) {
                               global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
                               
-                              if(response.data.downloadProgressDone > 0) {
+                              if(response.data.downloadProgressDone.length > 0) {
                                 store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
                               }
                               
@@ -162,7 +162,7 @@ router.beforeEach((to, from, next) => {
                           if(response.data.downloadProgressTotal > 0) {
                             global.isDownloadFailedLead = response.data.isDownloadProgress['download_failed_lead'];
 
-                            if(response.data.downloadProgressDone > 0) {
+                            if(response.data.downloadProgressDone.length > 0) {
                               store.dispatch('processDownloadCSV', {downloadProgressDone: response.data.downloadProgressDone});
                             }
 
